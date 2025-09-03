@@ -1,0 +1,18 @@
+<!DOCTYPE html>
+<html lang="en">
+  <%- include('../partials/head') %>
+  <body>
+    <div id="wrapper">
+      <!-- Ejs for the header -->
+      <%-include('../partials/header') %>
+      <!-- Ejs for the navigation  -->
+      <%-include('../partials/navigation')%>
+
+      <main>
+        <!-- body section the embedded javascript -->
+        <%- body %>
+      </main>
+      <%-include('../partials/footer') %>
+    </div>
+  </body>
+</html>
