@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <%- include('../partials/head', {title}) %>
+    <style>
+        .inventory-detail {
+            display: flex;
+            gap: 2rem;
+            margin: 2rem 0;
+        }
+        .detail-image img {
+            max-width: 100%;
+            height: auto;
+            border-radius: 8px;
+        }
+        .detail-info {
+            flex: 1;
+        }
+        .year-price {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin: 1rem 0;
+            font-size: 1.2rem;
+        }
+        .price {
+            color: #2c3e50;
+            font-weight: bold;
+            font-size: 1.5rem;
+        }
+        .description {
+            margin-top: 2rem;
+            padding: 1rem;
+            background-color: #f8f9fa;
+            border-radius: 5px;
+        }
+        @media (max-width: 768px) {
+            .inventory-detail {
+                flex-direction: column;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <%- include('../partials/header') %>
+    </header>
+    <nav>
+        <%- include('../partials/navigation') %>
+    </nav>
+    <main>
+        <h1><%= title %></h1>
+        <%- grid %>
+    </main>
+    <footer>
+        <%- include('../partials/footer') %>
+    </footer>
+</body>
+</html>
