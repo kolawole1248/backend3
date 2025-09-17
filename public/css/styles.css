@@ -655,3 +655,166 @@ footer {
     margin-bottom: 1rem;
     border-radius: 4px;
 }
+
+/* Inventory Grid Styles */
+#inv-display {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 2rem;
+    padding: 2rem 0;
+    list-style: none;
+    margin: 0;
+}
+
+#inv-display li {
+    background: white;
+    border-radius: 10px;
+    overflow: hidden;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+    transition: all 0.3s ease;
+    border: 1px solid #e0e0e0;
+}
+
+#inv-display li:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+}
+
+#inv-display li a {
+    text-decoration: none;
+    color: inherit;
+    display: block;
+}
+
+#inv-display li img {
+    width: 100%;
+    height: 200px;
+    object-fit: cover;
+    display: block;
+    transition: transform 0.3s ease;
+}
+
+#inv-display li:hover img {
+    transform: scale(1.05);
+}
+
+.namePrice {
+    padding: 1.5rem;
+}
+
+.namePrice hr {
+    border: none;
+    height: 2px;
+    background: linear-gradient(90deg, #3498db, #e74c3c);
+    margin: 1rem 0;
+    opacity: 0.7;
+}
+
+.namePrice h2 {
+    margin: 0 0 1rem 0;
+    font-size: 1.4rem;
+    color: #2c3e50;
+    font-weight: 600;
+}
+
+.namePrice h2 a {
+    color: #2c3e50;
+    text-decoration: none;
+    transition: color 0.3s ease;
+}
+
+.namePrice h2 a:hover {
+    color: #e74c3c;
+}
+
+.namePrice span {
+    display: block;
+    font-size: 1.5rem;
+    font-weight: bold;
+    color: #27ae60;
+    margin-top: 0.5rem;
+}
+
+/* No results message */
+.notice {
+    text-align: center;
+    font-size: 1.2rem;
+    color: #7f8c8d;
+    padding: 3rem;
+    grid-column: 1 / -1;
+    background: #f8f9fa;
+    border-radius: 8px;
+    margin: 2rem 0;
+}
+
+/* Classification-specific accent colors */
+#inv-display li:nth-child(6n+1) {
+    border-top: 4px solid #8e44ad; /* Custom */
+}
+
+#inv-display li:nth-child(6n+2) {
+    border-top: 4px solid #e74c3c; /* Sport */
+}
+
+#inv-display li:nth-child(6n+3) {
+    border-top: 4px solid #27ae60; /* SUV */
+}
+
+#inv-display li:nth-child(6n+4) {
+    border-top: 4px solid #f39c12; /* Truck */
+}
+
+#inv-display li:nth-child(6n+5) {
+    border-top: 4px solid #3498db; /* Sedan */
+}
+
+/* Responsive design */
+@media (max-width: 768px) {
+    #inv-display {
+        grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+        gap: 1.5rem;
+        padding: 1rem;
+    }
+    
+    .namePrice {
+        padding: 1rem;
+    }
+    
+    .namePrice h2 {
+        font-size: 1.2rem;
+    }
+    
+    .namePrice span {
+        font-size: 1.3rem;
+    }
+}
+
+@media (max-width: 480px) {
+    #inv-display {
+        grid-template-columns: 1fr;
+        gap: 1rem;
+        padding: 0.5rem;
+    }
+    
+    #inv-display li {
+        margin: 0.5rem;
+    }
+}
+
+/* Force styles - add this at the end of your CSS file */
+#inv-display {
+    display: grid !important;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)) !important;
+    gap: 2rem !important;
+    padding: 2rem 0 !important;
+    list-style: none !important;
+    margin: 0 !important;
+}
+
+#inv-display li {
+    background: white !important;
+    border-radius: 10px !important;
+    overflow: hidden !important;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1) !important;
+}
+
