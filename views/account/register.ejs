@@ -23,6 +23,11 @@
             color: #333;
         }
         
+        .form-group label::after {
+            content: " *";
+            color: #dc3545;
+        }
+        
         .form-group input {
             width: 100%;
             padding: 0.8rem;
@@ -30,12 +35,26 @@
             border-radius: 4px;
             font-size: 1rem;
             box-sizing: border-box;
+            border-left: 4px solid #007bff;
+            transition: all 0.3s ease;
         }
         
         .form-group input:focus {
             outline: none;
             border-color: #007bff;
             box-shadow: 0 0 5px rgba(0,123,255,0.3);
+        }
+        
+        .form-group input:valid {
+            border-left-color: #28a745;
+        }
+        
+        .form-group input:invalid:not(:focus):not(:placeholder-shown) {
+            border-left-color: #dc3545;
+        }
+        
+        .form-group input:invalid:focus {
+            border-left-color: #ffc107;
         }
         
         .password-toggle {
@@ -51,6 +70,7 @@
             border: none;
             cursor: pointer;
             color: #666;
+            font-size: 1.2rem;
         }
         
         .btn-register {
@@ -63,10 +83,16 @@
             font-size: 1rem;
             cursor: pointer;
             transition: background 0.3s;
+            margin-top: 1rem;
         }
         
         .btn-register:hover {
             background: #218838;
+        }
+        
+        .btn-register:disabled {
+            background: #6c757d;
+            cursor: not-allowed;
         }
         
         .password-requirements {
@@ -75,11 +101,20 @@
             border-radius: 4px;
             margin-top: 1rem;
             font-size: 0.9rem;
+            border-left: 4px solid #17a2b8;
         }
         
         .password-requirements ul {
             margin: 0;
             padding-left: 1.5rem;
+        }
+        
+        .requirement-met {
+            color: #28a745;
+        }
+        
+        .requirement-unmet {
+            color: #6c757d;
         }
         
         .login-link {
@@ -97,6 +132,35 @@
         .login-link a:hover {
             text-decoration: underline;
         }
+        
+        .validation-feedback {
+            font-size: 0.8rem;
+            margin-top: 0.25rem;
+            color: #dc3545;
+        }
+
+        /* Server-side validation error styles */
+        .server-errors {
+            background: #f8d7da; 
+            color: #721c24; 
+            padding: 15px; 
+            border-radius: 4px; 
+            margin-bottom: 1.5rem;
+            border-left: 4px solid #dc3545;
+        }
+        
+        .server-errors ul {
+            margin: 0;
+            padding-left: 1.5rem;
+        }
+        
+        .server-errors li {
+            margin-bottom: 0.5rem;
+        }
+        
+        .server-errors li:last-child {
+            margin-bottom: 0;
+        }
     </style>
 </head>
 <body>
@@ -113,16 +177,34 @@
             <!-- Flash Messages -->
             <%- messages() %>
             
-            <form action="/account/register" method="post">
+            <!-- Server-side validation errors -->
+            <% if (errors && !errors.isEmpty()) { %>
+                <div class="server-errors">
+                    <strong>Please fix the following errors:</strong>
+                    <ul>
+                        <% errors.array().forEach(error => { %>
+                            <li><%= error.msg %></li>
+                        <% }) %>
+                    </ul>
+                </div>
+            <% } %>
+
+            <form action="/account/register" method="post" id="registrationForm">
                 <div class="form-group">
                     <label for="account_firstname">First Name</label>
                     <input 
                         type="text" 
                         id="account_firstname" 
                         name="account_firstname" 
-                        placeholder="Enter your first name" 
+                        placeholder="Enter your first name (letters only, min 2 characters)" 
                         required
+                        pattern="[A-Za-zÀ-ÿ][A-Za-zÀ-ÿ'\- ]{1,}"
+                        title="First name must start with a letter and be at least 2 characters long"
+                        minlength="2"
+                        maxlength="50"
+                        value="<%= typeof account_firstname !== 'undefined' ? account_firstname : '' %>"
                     >
+                    <div class="validation-feedback" id="firstnameFeedback"></div>
                 </div>
                 
                 <div class="form-group">
@@ -131,9 +213,15 @@
                         type="text" 
                         id="account_lastname" 
                         name="account_lastname" 
-                        placeholder="Enter your last name" 
+                        placeholder="Enter your last name (letters only, min 2 characters)" 
                         required
+                        pattern="[A-Za-zÀ-ÿ][A-Za-zÀ-ÿ'\- ]{1,}"
+                        title="Last name must start with a letter and be at least 2 characters long"
+                        minlength="2"
+                        maxlength="50"
+                        value="<%= typeof account_lastname !== 'undefined' ? account_lastname : '' %>"
                     >
+                    <div class="validation-feedback" id="lastnameFeedback"></div>
                 </div>
                 
                 <div class="form-group">
@@ -142,9 +230,13 @@
                         type="email" 
                         id="account_email" 
                         name="account_email" 
-                        placeholder="Enter your email" 
+                        placeholder="Enter a valid email address (e.g., name@example.com)" 
                         required
+                        title="Please enter a valid email address"
+                        maxlength="100"
+                        value="<%= typeof account_email !== 'undefined' ? account_email : '' %>"
                     >
+                    <div class="validation-feedback" id="emailFeedback"></div>
                 </div>
                 
                 <div class="form-group password-toggle">
@@ -153,24 +245,29 @@
                         type="password" 
                         id="account_password" 
                         name="account_password" 
-                        placeholder="Enter your password" 
+                        placeholder="Minimum 12 characters with uppercase, number, and special character" 
                         required
                         minlength="12"
+                        pattern="^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{12,}$"
+                        title="Password must contain at least 1 uppercase letter, 1 lowercase letter, 1 number, and 1 special character"
+                        maxlength="100"
                     >
                     <button type="button" class="toggle-password" onclick="togglePassword()">👁️</button>
+                    <div class="validation-feedback" id="passwordFeedback"></div>
                 </div>
                 
                 <div class="password-requirements">
                     <strong>Password Requirements:</strong>
                     <ul>
-                        <li>Minimum 12 characters</li>
-                        <li>At least 1 capital letter</li>
-                        <li>At least 1 number</li>
-                        <li>At least 1 special character</li>
+                        <li id="req-length" class="requirement-unmet">Minimum 12 characters</li>
+                        <li id="req-uppercase" class="requirement-unmet">At least 1 capital letter</li>
+                        <li id="req-lowercase" class="requirement-unmet">At least 1 lowercase letter</li>
+                        <li id="req-number" class="requirement-unmet">At least 1 number</li>
+                        <li id="req-special" class="requirement-unmet">At least 1 special character (@$!%*?&)</li>
                     </ul>
                 </div>
                 
-                <button type="submit" class="btn-register">Register</button>
+                <button type="submit" class="btn-register" id="submitButton">Register</button>
             </form>
             
             <div class="login-link">
@@ -194,6 +291,85 @@
                 passwordInput.type = 'password';
                 toggleButton.textContent = '👁️';
             }
+        }
+
+        document.addEventListener('DOMContentLoaded', function() {
+            const form = document.getElementById('registrationForm');
+            const inputs = form.querySelectorAll('input[required]');
+            const passwordInput = document.getElementById('account_password');
+            
+            inputs.forEach(input => {
+                input.addEventListener('input', function() {
+                    validateField(this);
+                    if (this.id === 'account_password') {
+                        validatePasswordRequirements(this.value);
+                    }
+                });
+                
+                input.addEventListener('blur', function() {
+                    validateField(this);
+                });
+            });
+            
+            form.addEventListener('submit', function(e) {
+                let isValid = true;
+                
+                inputs.forEach(input => {
+                    if (!validateField(input)) {
+                        isValid = false;
+                    }
+                });
+                
+                if (!isValid) {
+                    e.preventDefault();
+                    showFormError('Please fix the validation errors before submitting.');
+                }
+            });
+            
+            validatePasswordRequirements(passwordInput.value);
+        });
+        
+        function validateField(field) {
+            const feedback = document.getElementById(field.id + 'Feedback');
+            
+            if (!field.checkValidity()) {
+                feedback.textContent = field.validationMessage;
+                return false;
+            } else {
+                feedback.textContent = '';
+                return true;
+            }
+        }
+        
+        function validatePasswordRequirements(password) {
+            const requirements = {
+                length: password.length >= 12,
+                uppercase: /[A-Z]/.test(password),
+                lowercase: /[a-z]/.test(password),
+                number: /\d/.test(password),
+                special: /[@$!%*?&]/.test(password)
+            };
+            
+            document.getElementById('req-length').className = requirements.length ? 'requirement-met' : 'requirement-unmet';
+            document.getElementById('req-uppercase').className = requirements.uppercase ? 'requirement-met' : 'requirement-unmet';
+            document.getElementById('req-lowercase').className = requirements.lowercase ? 'requirement-met' : 'requirement-unmet';
+            document.getElementById('req-number').className = requirements.number ? 'requirement-met' : 'requirement-unmet';
+            document.getElementById('req-special').className = requirements.special ? 'requirement-met' : 'requirement-unmet';
+            
+            return Object.values(requirements).every(req => req);
+        }
+        
+        function showFormError(message) {
+            const flashMessage = document.createElement('div');
+            flashMessage.style.cssText = 'background: #f8d7da; color: #721c24; padding: 10px; border-radius: 4px; margin-bottom: 1rem;';
+            flashMessage.textContent = message;
+            
+            const form = document.getElementById('registrationForm');
+            form.parentNode.insertBefore(flashMessage, form);
+            
+            setTimeout(() => {
+                flashMessage.remove();
+            }, 5000);
         }
     </script>
 </body>

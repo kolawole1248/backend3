@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <%- include('../partials/head', {title}) %>
+    <style>
+        .form-container {
+            max-width: 500px;
+            margin: 2rem auto;
+            padding: 2rem;
+            background: #fff;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+        }
+        
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+        
+        .form-group label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: bold;
+        }
+        
+        .form-group input {
+            width: 100%;
+            padding: 0.8rem;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 1rem;
+        }
+        
+        .btn-submit {
+            width: 100%;
+            background: #28a745;
+            color: white;
+            padding: 1rem;
+            border: none;
+            border-radius: 4px;
+            font-size: 1rem;
+            cursor: pointer;
+        }
+        
+        .server-errors {
+            background: #f8d7da;
+            color: #721c24;
+            padding: 15px;
+            border-radius: 4px;
+            margin-bottom: 1rem;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <%- include('../partials/header') %>
+    </header>
+    <nav>
+        <%- include('../partials/navigation') %>
+    </nav>
+    <main>
+        <div class="form-container">
+            <h1><%= title %></h1>
+            
+            <!-- Flash Messages -->
+            <%- messages() %>
+            
+            <!-- Server-side validation errors -->
+            <% if (errors && !errors.isEmpty()) { %>
+                <div class="server-errors">
+                    <strong>Please fix the following errors:</strong>
+                    <ul>
+                        <% errors.array().forEach(error => { %>
+                            <li><%= error.msg %></li>
+                        <% }) %>
+                    </ul>
+                </div>
+            <% } %>
+            
+            <form action="/inv/add-classification" method="post" id="classificationForm">
+                <div class="form-group">
+                    <label for="classification_name">Classification Name</label>
+                    <input 
+                        type="text" 
+                        id="classification_name" 
+                        name="classification_name" 
+                        required
+                        pattern="[A-Za-z0-9]+"
+                        title="Classification name must be alphanumeric with no spaces or special characters"
+                        placeholder="Enter classification name (letters and numbers only)"
+                        value="<%= typeof classification_name !== 'undefined' ? classification_name : '' %>"
+                    >
+                </div>
+                
+                <button type="submit" class="btn-submit">Add Classification</button>
+            </form>
+        </div>
+    </main>
+    <footer>
+        <%- include('../partials/footer') %>
+    </footer>
+
+    <script>
+        // Client-side validation
+        document.addEventListener('DOMContentLoaded', function() {
+            const form = document.getElementById('classificationForm');
+            const input = document.getElementById('classification_name');
+            
+            input.addEventListener('input', function() {
+                validateField(this);
+            });
+            
+            form.addEventListener('submit', function(e) {
+                if (!validateField(input)) {
+                    e.preventDefault();
+                    alert('Please fix the validation error before submitting.');
+                }
+            });
+        });
+        
+        function validateField(field) {
+            if (!field.checkValidity()) {
+                field.style.borderColor = '#dc3545';
+                return false;
+            } else {
+                field.style.borderColor = '#28a745';
+                return true;
+            }
+        }
+    </script>
+</body>
+</html>

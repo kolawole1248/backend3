@@ -12,4 +12,28 @@ async function registerAccount(account_firstname, account_lastname, account_emai
   }
 }
 
-module.exports = { registerAccount }
+// ============================================
+// NEW FUNCTION ADDED: Check for existing email
+// This function prevents duplicate registrations
+// ============================================
+/* **********************
+ *   Check for existing email
+ * ********************* */
+async function checkExistingEmail(account_email){
+  try {
+    const sql = "SELECT * FROM account WHERE account_email = $1"
+    const email = await pool.query(sql, [account_email])
+    return email.rowCount
+  } catch (error) {
+    return error.message
+  }
+}
+
+// ============================================
+// UPDATED EXPORTS: Added checkExistingEmail function
+// Now both functions are available to other files
+// ============================================
+module.exports = { 
+  registerAccount,
+  checkExistingEmail  // NEW: Exporting the email check function
+}
