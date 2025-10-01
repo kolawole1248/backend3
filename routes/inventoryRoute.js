@@ -37,6 +37,11 @@ router.post(
   utilities.handleErrors(invController.addInventory)
 )
 
+// ============================================
+// NEW: AJAX route for inventory management
+// ============================================
+router.get("/getInventory/:classification_id", utilities.handleErrors(invController.getInventoryJSON))
+
 // Route to trigger intentional error
 router.get("/trigger-error", utilities.handleErrors(invController.triggerError))
 

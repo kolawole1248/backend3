@@ -19,14 +19,17 @@ router.post(
   utilities.handleErrors(accountController.registerAccount)
 )
 
-// Process login attempt
+// Process login request
 router.post(
   "/login",
   regValidate.loginRules(),
   regValidate.checkLoginData,
-  (req, res) => {
-    res.status(200).send('login process')
-  }
+  utilities.handleErrors(accountController.accountLogin)
 )
+
+// ============================================
+// UPDATED: Account management route with authorization
+// ============================================
+router.get("/", utilities.checkLogin, utilities.handleErrors(accountController.buildManagement))
 
 module.exports = router

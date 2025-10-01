@@ -16,6 +16,7 @@ const accountRoute = require("./routes/accountRoute")
 const utilities = require("./utilities/")
 const session = require("express-session")
 const pool = require('./database/')
+const cookieParser = require("cookie-parser")
 
 /* ***********************
  * View Engine and Templates
@@ -48,6 +49,14 @@ app.use(function(req, res, next){
   next()
 })
 
+app.use(cookieParser())
+
+// ============================================
+// NEW: Add JWT authentication middleware
+// This checks for valid JWT tokens on every request
+// ============================================
+app.use(utilities.checkJWTToken)
+
 /* ***********************
  * Routes
  *************************/
@@ -55,9 +64,9 @@ app.use(static)
 // Index route
 app.get("/", utilities.handleErrors(baseController.buildHome))
 // Inventory routes
-app.use("/inv", utilities.handleErrors(inventoryRoute))
+app.use("/inv", inventoryRoute)
 // Account routes
-app.use("/account", utilities.handleErrors(accountRoute))
+app.use("/account", accountRoute)
 
 // File Not Found Route - must be last route in list
 app.use(async (req, res, next) => {

@@ -39,9 +39,16 @@ invCont.buildByInventoryId = async function (req, res, next) {
  * ************************** */
 invCont.buildManagement = async function (req, res, next) {
   let nav = await utilities.getNav()
+  
+  // ============================================
+  // NEW: Add classification dropdown for inventory management
+  // ============================================
+  const classificationSelect = await utilities.buildClassificationList()
+  
   res.render("./inventory/management", {
     title: "Inventory Management",
     nav,
+    classificationSelect,  // ✅ ADDED: Pass classification dropdown to view
     errors: null
   })
 }
@@ -160,6 +167,19 @@ invCont.addInventory = async function (req, res, next) {
 invCont.triggerError = async function (req, res, next) {
   // Intentionally cause an error
   throw new Error("Intentional 500 error triggered from footer link")
+}
+
+/* ***************************
+ *  Return Inventory by Classification As JSON
+ * ************************** */
+invCont.getInventoryJSON = async (req, res, next) => {
+  const classification_id = parseInt(req.params.classification_id)
+  const data = await invModel.getInventoryByClassificationId(classification_id)
+  if(data.length > 0) {
+    return res.json(data)
+  } else {
+    return res.json([]) // Return empty array if no data
+  }
 }
 
 module.exports = invCont
