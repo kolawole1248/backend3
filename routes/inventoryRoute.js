@@ -42,6 +42,34 @@ router.post(
 // ============================================
 router.get("/getInventory/:classification_id", utilities.handleErrors(invController.getInventoryJSON))
 
+// ============================================
+// NEW: Route to build edit inventory view
+// ============================================
+router.get("/edit/:inv_id", utilities.handleErrors(invController.buildEditInventoryView))
+
+// ============================================
+// NEW: Route to process inventory update
+// ============================================
+router.post(
+  "/update",
+  invValidate.inventoryRules(),
+  invValidate.checkUpdateData,
+  utilities.handleErrors(invController.updateInventory)
+)
+
+// ============================================
+// NEW: Route to build delete confirmation view
+// ============================================
+router.get("/delete/:inv_id", utilities.handleErrors(invController.buildDeleteConfirmationView))
+
+// ============================================
+// NEW: Route to process inventory deletion
+// ============================================
+router.post(
+  "/delete",
+  utilities.handleErrors(invController.deleteInventory)
+)
+
 // Route to trigger intentional error
 router.get("/trigger-error", utilities.handleErrors(invController.triggerError))
 
