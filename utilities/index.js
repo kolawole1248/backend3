@@ -146,13 +146,27 @@ Util.checkJWTToken = (req, res, next) => {
 /* ****************************************
  *  Check Login
  * ************************************ */
- Util.checkLogin = (req, res, next) => {
+Util.checkLogin = (req, res, next) => {
   if (res.locals.loggedin) {
     next()
   } else {
     req.flash("notice", "Please log in.")
     return res.redirect("/account/login")
   }
- }
+}
+
+/* ****************************************
+ *  Check Account Type for Inventory Management
+ * ************************************ */
+Util.checkAccountType = (req, res, next) => {
+  if (res.locals.loggedin && 
+      (res.locals.accountData.account_type === 'Employee' || 
+       res.locals.accountData.account_type === 'Admin')) {
+    next()
+  } else {
+    req.flash("notice", "Access denied. Employee or Admin privileges required.")
+    return res.redirect("/account/login")
+  }
+}
 
 module.exports = Util

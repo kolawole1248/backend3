@@ -28,8 +28,40 @@ router.post(
 )
 
 // ============================================
+// NEW: Account update routes
+// ============================================
+router.get("/update/:account_id", 
+  utilities.checkLogin, 
+  utilities.handleErrors(accountController.buildUpdateView)
+)
+
+router.post("/update",
+  utilities.checkLogin,
+  regValidate.updateAccountRules(),
+  regValidate.checkUpdateData,
+  utilities.handleErrors(accountController.updateAccount)
+)
+
+router.post("/update-password",
+  utilities.checkLogin,
+  regValidate.updatePasswordRules(),
+  regValidate.checkPasswordData,
+  utilities.handleErrors(accountController.updatePassword)
+)
+
+// ============================================
+// NEW: Logout route
+// ============================================
+router.get("/logout", 
+  utilities.handleErrors(accountController.accountLogout)
+)
+
+// ============================================
 // UPDATED: Account management route with authorization
 // ============================================
-router.get("/", utilities.checkLogin, utilities.handleErrors(accountController.buildManagement))
+router.get("/", 
+  utilities.checkLogin, 
+  utilities.handleErrors(accountController.buildManagement)
+)
 
 module.exports = router

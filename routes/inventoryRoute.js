@@ -7,7 +7,11 @@ const classValidate = require('../utilities/classification-validation')
 const invValidate = require('../utilities/inventory-validation')
 
 // Route to build management view
-router.get("/", utilities.handleErrors(invController.buildManagement))
+router.get("/", 
+  utilities.checkLogin, 
+  utilities.checkAccountType, 
+  utilities.handleErrors(invController.buildManagement)
+)
 
 // Route to build inventory by classification view
 router.get("/type/:classificationId", utilities.handleErrors(invController.buildByClassificationId))
@@ -16,22 +20,34 @@ router.get("/type/:classificationId", utilities.handleErrors(invController.build
 router.get("/detail/:invId", utilities.handleErrors(invController.buildByInventoryId))
 
 // Route to build add classification view
-router.get("/add-classification", utilities.handleErrors(invController.buildAddClassification))
+router.get("/add-classification", 
+  utilities.checkLogin, 
+  utilities.checkAccountType, 
+  utilities.handleErrors(invController.buildAddClassification)
+)
 
 // Route to process add classification
 router.post(
   "/add-classification",
+  utilities.checkLogin,
+  utilities.checkAccountType,
   classValidate.classificationRules(),
   classValidate.checkClassificationData,
   utilities.handleErrors(invController.addClassification)
 )
 
 // Route to build add inventory view
-router.get("/add-inventory", utilities.handleErrors(invController.buildAddInventory))
+router.get("/add-inventory", 
+  utilities.checkLogin, 
+  utilities.checkAccountType, 
+  utilities.handleErrors(invController.buildAddInventory)
+)
 
 // Route to process add inventory
 router.post(
   "/add-inventory",
+  utilities.checkLogin,
+  utilities.checkAccountType,
   invValidate.inventoryRules(),
   invValidate.checkInventoryData,
   utilities.handleErrors(invController.addInventory)
@@ -40,18 +56,28 @@ router.post(
 // ============================================
 // NEW: AJAX route for inventory management
 // ============================================
-router.get("/getInventory/:classification_id", utilities.handleErrors(invController.getInventoryJSON))
+router.get("/getInventory/:classification_id", 
+  utilities.checkLogin, 
+  utilities.checkAccountType, 
+  utilities.handleErrors(invController.getInventoryJSON)
+)
 
 // ============================================
 // NEW: Route to build edit inventory view
 // ============================================
-router.get("/edit/:inv_id", utilities.handleErrors(invController.buildEditInventoryView))
+router.get("/edit/:inv_id", 
+  utilities.checkLogin, 
+  utilities.checkAccountType, 
+  utilities.handleErrors(invController.buildEditInventoryView)
+)
 
 // ============================================
 // NEW: Route to process inventory update
 // ============================================
 router.post(
   "/update",
+  utilities.checkLogin,
+  utilities.checkAccountType,
   invValidate.inventoryRules(),
   invValidate.checkUpdateData,
   utilities.handleErrors(invController.updateInventory)
@@ -60,13 +86,19 @@ router.post(
 // ============================================
 // NEW: Route to build delete confirmation view
 // ============================================
-router.get("/delete/:inv_id", utilities.handleErrors(invController.buildDeleteConfirmationView))
+router.get("/delete/:inv_id", 
+  utilities.checkLogin, 
+  utilities.checkAccountType, 
+  utilities.handleErrors(invController.buildDeleteConfirmationView)
+)
 
 // ============================================
 // NEW: Route to process inventory deletion
 // ============================================
 router.post(
   "/delete",
+  utilities.checkLogin,
+  utilities.checkAccountType,
   utilities.handleErrors(invController.deleteInventory)
 )
 

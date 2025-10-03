@@ -42,6 +42,19 @@
         .management-link:hover {
             background: #0056b3;
         }
+        
+        .inventory-section {
+            margin-top: 2rem;
+            padding-top: 1rem;
+            border-top: 1px solid #eee;
+        }
+        
+        .account-info {
+            background: #f8f9fa;
+            padding: 1rem;
+            border-radius: 4px;
+            margin-bottom: 1.5rem;
+        }
     </style>
 </head>
 <body>
@@ -58,19 +71,33 @@
             <!-- Flash Messages -->
             <%- messages() %>
             
-            <div class="welcome-message">
-                <strong>Success!</strong> You're logged in.
+            <!-- Personalized Greeting based on account type -->
+            <h2>Welcome <%= accountData.account_firstname %></h2>
+            
+            <!-- Account Information Display -->
+            <div class="account-info">
+                <p><strong>Name:</strong> <%= accountData.account_firstname %> <%= accountData.account_lastname %></p>
+                <p><strong>Email:</strong> <%= accountData.account_email %></p>
+                <p><strong>Account Type:</strong> <%= accountData.account_type %></p>
             </div>
             
-            <p>Welcome to your account management dashboard. Here you can manage your account settings and preferences.</p>
-            
+            <!-- Update Account Information Link (for all account types) -->
             <div class="management-links">
-                <a href="/account/update" class="management-link">
+                <a href="/account/update/<%= accountData.account_id %>" class="management-link">
                     Update Account Information
                 </a>
-                <a href="/inv/" class="management-link">
-                    Inventory Management
-                </a>
+            </div>
+            
+            <!-- Inventory Management Section (Only for Employees/Admins) -->
+            <% if (accountData.account_type === 'Employee' || accountData.account_type === 'Admin') { %>
+                <div class="inventory-section">
+                    <h3>Inventory Management</h3>
+                    <p><a href="/inv/">Manage Inventory</a></p>
+                </div>
+            <% } %>
+            
+            <!-- Logout Link -->
+            <div class="management-links">
                 <a href="/account/logout" class="management-link" style="background: #dc3545;">
                     Logout
                 </a>
