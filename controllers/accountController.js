@@ -263,4 +263,8 @@ accountController.accountLogout = async function (req, res, next) {
   res.redirect("/")
 }
 
+/* ***************************
+ * Process logout
+ * ************************** */
+
 module.exports = accountController
