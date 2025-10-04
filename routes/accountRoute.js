@@ -64,4 +64,8 @@ router.get("/",
   utilities.handleErrors(accountController.buildManagement)
 )
 
+router.get('/favicon.ico', (req, res) => {
+  res.status(204).end(); // No content - stops the 404 errors
+});
+
 module.exports = router

@@ -2,6 +2,17 @@
  * This server.js file is the primary file of the 
  * application. It is used to control the project.
  *******************************************/
+
+
+/* ***********************
+ * Environment Debug
+ *************************/
+console.log('=== ENVIRONMENT DEBUG ===');
+console.log('NODE_ENV:', process.env.NODE_ENV);
+console.log('ACCESS_TOKEN_SECRET present:', !!process.env.ACCESS_TOKEN_SECRET);
+console.log('SESSION_SECRET present:', !!process.env.SESSION_SECRET);
+console.log('DATABASE_URL present:', !!process.env.DATABASE_URL);
+console.log('=== END DEBUG ===');
 /* ***********************
  * Require Statements
  *************************/

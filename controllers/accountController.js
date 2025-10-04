@@ -119,13 +119,20 @@ accountController.registerAccount = async function (req, res) {
 }
 
 /* ****************************************
- *  Process login request - FIXED VERSION
+ *  Process login request - WITH DEBUG FIX
  * ************************************ */
 accountController.accountLogin = async function (req, res) {
   let nav = await utilities.getNav()
   const { account_email, account_password } = req.body
   
   try {
+    // DEBUG: Check environment variables
+    console.log('=== LOGIN DEBUG ===');
+    console.log('NODE_ENV:', process.env.NODE_ENV);
+    console.log('ACCESS_TOKEN_SECRET available:', !!process.env.ACCESS_TOKEN_SECRET);
+    console.log('ACCESS_TOKEN_SECRET length:', process.env.ACCESS_TOKEN_SECRET ? process.env.ACCESS_TOKEN_SECRET.length : 'MISSING');
+    console.log('=== END DEBUG ===');
+
     const accountData = await accountModel.getAccountByEmail(account_email)
     if (!accountData) {
       req.flash("notice", "Please check your credentials and try again.")
@@ -139,9 +146,22 @@ accountController.accountLogin = async function (req, res) {
     
     if (await bcrypt.compare(account_password, accountData.account_password)) {
       delete accountData.account_password
+      
+      // CRITICAL FIX: Check if JWT secret exists before signing
+      if (!process.env.ACCESS_TOKEN_SECRET) {
+        console.error('❌ CRITICAL ERROR: ACCESS_TOKEN_SECRET is missing in production!');
+        req.flash("notice", "Server configuration error. Please contact administrator.")
+        return res.status(500).render("account/login", {
+          title: "Login",
+          nav,
+          errors: null,
+          account_email,
+        });
+      }
+      
       const accessToken = jwt.sign(accountData, process.env.ACCESS_TOKEN_SECRET, { expiresIn: 3600 * 1000 })
       
-      // Production cookie settings - FIXED
+      // Production cookie settings
       res.cookie("jwt", accessToken, { 
         httpOnly: true, 
         secure: process.env.NODE_ENV === 'production',
@@ -195,6 +215,14 @@ accountController.updateAccount = async function (req, res, next) {
     // Update the JWT token with new account data
     const accountData = await accountModel.getAccountById(account_id)
     delete accountData.account_password
+    
+    // Check JWT secret before signing
+    if (!process.env.ACCESS_TOKEN_SECRET) {
+      console.error('❌ ACCESS_TOKEN_SECRET missing during account update');
+      req.flash("notice", "Configuration error. Update completed but login may be required.")
+      return res.redirect("/account/");
+    }
+    
     const accessToken = jwt.sign(accountData, process.env.ACCESS_TOKEN_SECRET, { expiresIn: 3600 * 1000 })
     
     // Updated cookie settings for production
@@ -262,9 +290,5 @@ accountController.accountLogout = async function (req, res, next) {
   req.flash("notice", "You have been logged out.")
   res.redirect("/")
 }
-
-/* ***************************
- * Process logout
- * ************************** */
 
 module.exports = accountController
