@@ -3,7 +3,6 @@
  * application. It is used to control the project.
  *******************************************/
 
-
 /* ***********************
  * Environment Debug
  *************************/
@@ -13,6 +12,7 @@ console.log('ACCESS_TOKEN_SECRET present:', !!process.env.ACCESS_TOKEN_SECRET);
 console.log('SESSION_SECRET present:', !!process.env.SESSION_SECRET);
 console.log('DATABASE_URL present:', !!process.env.DATABASE_URL);
 console.log('=== END DEBUG ===');
+
 /* ***********************
  * Require Statements
  *************************/
@@ -24,6 +24,7 @@ const static = require("./routes/static")
 const baseController = require("./controllers/baseController")
 const inventoryRoute = require("./routes/inventoryRoute")
 const accountRoute = require("./routes/accountRoute")
+const reviewRoute = require("./routes/reviewRoute") // ✅ ADDED
 const utilities = require("./utilities/")
 const session = require("express-session")
 const pool = require('./database/')
@@ -47,7 +48,7 @@ app.use(session({
     createTableIfMissing: true,
     pool,
   }),
-  secret: process.env.SESSION_SECRET,
+  secret: process.env.SESSION_SECRET || 'fallback_secret_for_development', // ✅ ADDED FALLBACK
   resave: true,
   saveUninitialized: true,
   name: 'sessionId',
@@ -78,6 +79,8 @@ app.get("/", utilities.handleErrors(baseController.buildHome))
 app.use("/inv", inventoryRoute)
 // Account routes
 app.use("/account", accountRoute)
+// ✅ ADDED: Review routes (BEFORE 404 handler)
+app.use("/reviews", reviewRoute)
 
 // File Not Found Route - must be last route in list
 app.use(async (req, res, next) => {
@@ -108,8 +111,8 @@ app.use(async (err, req, res, next) => {
  * Local Server Information
  * Values from .env (environment) file
  *************************/
-const port = process.env.PORT
-const host = process.env.HOST
+const port = process.env.PORT || 5500 // ✅ ADDED DEFAULT PORT
+const host = process.env.HOST || 'localhost' // ✅ ADDED DEFAULT HOST
 
 /* ***********************
  * Log statement to confirm server operation

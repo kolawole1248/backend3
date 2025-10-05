@@ -1,4 +1,5 @@
 const invModel = require("../models/inventory-model")
+const reviewModel = require("../models/review-model") // ✅ ADDED: Import review model
 const utilities = require("../utilities/")
 
 const invCont = {}
@@ -20,17 +21,23 @@ invCont.buildByClassificationId = async function (req, res, next) {
 }
 
 /* ***************************
- *  Build inventory by inventory id view
+ *  Build inventory by inventory id view - UPDATED WITH REVIEWS
  * ************************** */
 invCont.buildByInventoryId = async function (req, res, next) {
   const inv_id = req.params.invId
   const data = await invModel.getInventoryById(inv_id)
   const grid = await utilities.buildInventoryDetail(data)
   let nav = await utilities.getNav()
+  
+  // ✅ ADDED: Get reviews for this vehicle
+  const reviews = await reviewModel.getReviewsByInventoryId(inv_id)
+  
   res.render("./inventory/detail", {
     title: `${data.inv_make} ${data.inv_model}`,
     nav,
     grid,
+    reviews, // ✅ ADDED: Pass reviews to the view
+    inv_id: data.inv_id // ✅ ADDED: Pass inv_id for review forms
   })
 }
 
